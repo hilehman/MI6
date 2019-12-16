@@ -21,11 +21,7 @@ public class Squad {
 	/**
 	 * Retrieves the single instance of this class.
 	 */
-	public static Squad getInstance() {
-		if (SingletonHolder.squad == null)
-			new SingletonHolder();
-		return SingletonHolder.squad;
-	}
+	public static Squad getInstance() { return SingletonHolder.squad; }
 
 	/**
 	 * Initializes the squad. This method adds all the agents to the squad.
