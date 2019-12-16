@@ -18,7 +18,7 @@ public interface Event<T> extends Message {
     public class MissionRecieveEvent extends GenEvent{
         private String missionName;
         private String agentNumber;
-        private String gadget = "";
+        private String gadget;
         public MissionRecieveEvent(){
             
         }
