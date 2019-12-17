@@ -2,6 +2,7 @@ package bgu.spl.mics.application.publishers;
 
 import bgu.spl.mics.Publisher;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.passiveObjects.MissionInfo;
 
 /**
  * A Publisher only.
@@ -11,10 +12,11 @@ import bgu.spl.mics.Subscriber;
  * You MAY change constructor signatures and even add new public constructors.
  */
 public class Intelligence extends Publisher {
+	private MissionInfo[] missions;
 
-	public Intelligence() {
+	public Intelligence(MissionInfo[] sourceMissions) {
 		super("Change_This_Name");
-		// TODO Implement this
+		missions = sourceMissions;
 	}
 
 	@Override

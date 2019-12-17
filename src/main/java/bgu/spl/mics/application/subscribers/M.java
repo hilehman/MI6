@@ -10,9 +10,8 @@ import bgu.spl.mics.Subscriber;
  */
 public class M extends Subscriber {
 
-	public M() {
-		super("Change_This_Name");
-		// TODO Implement this
+	public M(String name) {
+		super(name);
 	}
 
 	@Override
