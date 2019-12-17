@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
  * No public constructor is allowed except for the empty constructor.
  */
 public class Future<T> {
+
+	//	**************fields*****************
 	private boolean isDone;
 	private T output;  //ADDED
 
@@ -31,7 +33,15 @@ public class Future<T> {
 	 *
 	 */
 	public T get() {
+
+
+
+
 		//TODO: implement this.
+
+
+
+
 		return null;
 	}
 
