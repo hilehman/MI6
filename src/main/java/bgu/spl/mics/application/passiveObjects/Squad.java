@@ -14,7 +14,7 @@ public class Squad {
 
 	private Map<String, Agent> agents;
 
-	// creating a singleton
+	// creates a singleton
 	private static class SingletonHolder {
 		private static Squad squad = new Squad();
 	}

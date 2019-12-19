@@ -1,5 +1,8 @@
 package bgu.spl.mics.application.passiveObjects;
 
+import bgu.spl.mics.MessageBroker;
+import bgu.spl.mics.MessageBrokerImpl;
+
 import java.util.List;
 
 /**
@@ -12,6 +15,7 @@ import java.util.List;
  */
 public class Diary {
 
+	//***  fields  ***
 	private List<Report> reports;
 	private int total;
 
@@ -19,20 +23,17 @@ public class Diary {
 	 * Retrieves the single instance of this class.
 	 */
 
-		// creating a singleton
+	//***  constructor (singleton, thread-safe)  ***
 	private static class SingletonHolder {
 		private static Diary diary = new Diary();
 	}
-	/**
-	 * Retrieves the single instance of this class.
-	 */
+
 	public static Diary getInstance() {
-		if (Diary.SingletonHolder.diary == null)
-			new Diary.SingletonHolder();
 		return Diary.SingletonHolder.diary;
 
 	}
 
+	//***  methods  ***
 	public List<Report> getReports() { return reports; }
 
 	/**
@@ -51,6 +52,7 @@ public class Diary {
 	 * This method is called by the main method in order to generate the output.
 	 */
 	public void printToFile(String filename){
+
 		//TODO: Implement this
 	}
 

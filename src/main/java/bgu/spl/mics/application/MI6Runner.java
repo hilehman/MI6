@@ -20,6 +20,8 @@ import com.google.gson.JsonObject;
  */
 public class MI6Runner {
     public static void main(String[] args) {
+
+        System.out.println("asdasd");
         String jsonInput = args[0];
         String inventoryOutput = args[1];
         String diaryOutput = args[2];
