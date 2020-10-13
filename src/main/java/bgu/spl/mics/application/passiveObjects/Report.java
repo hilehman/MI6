@@ -24,7 +24,7 @@ public class Report {
 		return missionName;
 	}
 
-   // Sets the mission name.
+	// Sets the mission name.
 	public void setMissionName(String missionName) {
 		this.missionName = missionName;
 	}
@@ -33,15 +33,15 @@ public class Report {
 	public int getM() {
 		return M;
 	}
-    //	Sets the M's id.
+	//	Sets the M's id.
 	public void setM(int m) {
 		M = m;
 	}
-    //	Retrieves the Moneypenny's id.
+	//	Retrieves the Moneypenny's id.
 	public int getMoneypenny() {
 		return Moneypenny;
 	}
-    //	Sets the Moneypenny's id.
+	//	Sets the Moneypenny's id.
 	public void setMoneypenny(int moneypenny) {
 		Moneypenny = moneypenny;
 	}

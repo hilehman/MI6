@@ -1,22 +1,29 @@
 package bgu.spl.mics.application.passiveObjects;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 /**
  * Passive data-object representing a information about an agent in MI6.
- * You must not alter any of the given public methods of this class. 
+ * You must not alter any of the given public methods of this class.
  * <p>
  * You may add ONLY private fields and methods to this class.
  */
 public class Squad {
 
-	private Map<String, Agent> agents;
+	public Map<String, Agent> agents;
+	private Semaphore semaphore;
+
 
 	// creates a singleton
 	private static class SingletonHolder {
 		private static Squad squad = new Squad();
+
+	}
+	private Squad (){
+		semaphore = new Semaphore (5, true);
 	}
 	/**
 	 * Retrieves the single instance of this class.
@@ -29,9 +36,14 @@ public class Squad {
 	 * @param agents 	Data structure containing all data necessary for initialization
 	 * 						of the squad.
 	 */
+
+
+
 	public void load (Agent[] agents) {
-		this.agents = new HashMap<String, Agent>();
-		for(Agent agent : agents) this.agents.put(agent.getSerialNumber(), agent);
+		synchronized (this){
+			this.agents = new HashMap<String, Agent>();
+			for(Agent agent : agents) this.agents.put(agent.getSerialNumber(), agent);
+		}
 	}
 
 
@@ -39,9 +51,18 @@ public class Squad {
 	 * Releases agents.
 	 */
 	public void releaseAgents(List<String> serials) {
-		for (String serial:serials)
-			if (agents.get(serial) != null)
-				agents.get(serial).release();
+
+		if (!(serials == null)) {
+			if (!serials.isEmpty()) {
+				for (String serial : serials) {
+					if (agents.containsKey(serial)) {
+
+						agents.get(serial).release();
+					}
+				}
+			}
+		}
+		semaphore.release();
 	}
 
 	/**
@@ -51,7 +72,7 @@ public class Squad {
 	public void sendAgents(List<String> serials, int time){
 		Thread t = new Thread("Sleeper");
 		try{
-			Thread.sleep(time);
+			Thread.sleep(time*100);
 		} catch (Exception e){}
 		releaseAgents(serials);
 	}
@@ -61,21 +82,28 @@ public class Squad {
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public boolean getAgents(List<String> serials){
+	public boolean getAgents(List<String> serials) throws InterruptedException {
+		serials.sort(String::compareTo);
 		for (String serial:serials) {
-			if (agents.get(serial) == null)
+			if (agents.get(serial) == null) {
 				return false;
+			}
 		}
-		for (String serial:serials){
+		semaphore.acquire();
+		for (String serial:serials) {
 			Agent agentToAcquire = agents.get(serial);
 			while (!agentToAcquire.isAvailable()) {
-//TODO implement wait method
+				try {
+					semaphore.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			agentToAcquire.acquire();
 		}
+		semaphore.release();
 		return true;
-		}
-
+	}
 
 	/**
 	 * gets the agents names
@@ -84,14 +112,16 @@ public class Squad {
 	 */
 	public List<String> getAgentsNames(List<String> serials){
 		List<String> agentsNames = new ArrayList<>();
+
 		for (String serial : serials) {
-			String agentName = agents.get(serial).getName();
-			agentsNames.add(agentName);
+			if(agents.get(serial) != null){
+				String agentName = agents.get(serial).getName();
+				agentsNames.add(agentName);
+			}
+			else return null;
 		}
 		return agentsNames;
 	}
 
-	public Map<String, Agent> getAgentsMap(){
-		return agents;
-	}
 }
+

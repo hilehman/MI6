@@ -6,7 +6,5 @@ package bgu.spl.mics;
  * Broadcast-message type (the message Class).
  */
 public interface Broadcast extends Message {
-    public class TickBroadcast implements Broadcast{
 
-    }
 }

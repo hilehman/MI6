@@ -8,28 +8,5 @@ package bgu.spl.mics;
  * Round-Robin fashion.
  */
 public interface Event<T> extends Message {
-    public class GenEvent<T> implements Event{
-        Future<T> future;
-        public GenEvent(){
 
-        }
-    }
-
-    public class MissionRecieveEvent extends GenEvent{
-        private String missionName;
-        private String agentNumber;
-        private String gadget;
-        public MissionRecieveEvent(){
-            
-        }
-
-    }
-    public class AgentsAvailableEvent extends GenEvent{
-
-    }
-    public class GaddetAvailableEvent extends GenEvent{
-
-    }
 }
-
-

@@ -1,13 +1,12 @@
 package bgu.spl.mics.application.passiveObjects;
 
-
 /**
  * Passive data-object representing a information about an agent in MI6.
- * You must not alter any of the given public methods of this class.
+ * You must not alter any of the given public methods of this class. 
  * <p>
  * You may add ONLY private fields and methods to this class.
  */
-public class Agent {
+public class Agent{
 	// ***    fields    ***
 	private String name;
 	private String serialNumber;
@@ -51,21 +50,21 @@ public class Agent {
 	 * <p>
 	 * @return if the agent is available.
 	 */
-	public boolean isAvailable() {
+	public synchronized boolean isAvailable() {
 		return available;
 	}
 
 	/**
 	 * Acquires an agent.
 	 */
-	public void acquire(){
+	public synchronized void acquire(){
 		available = false;
 	}
 
 	/**
 	 * Releases an agent.
 	 */
-	public void release(){
+	public synchronized void release(){
 		available = true;
 	}
 }

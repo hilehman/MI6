@@ -1,32 +1,36 @@
 package bgu.spl.mics.application;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.lang.reflect.Array;
+import java.util.*;
+
+import bgu.spl.mics.MessageBroker;
+import bgu.spl.mics.MessageBrokerImpl;
+import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.application.passiveObjects.*;
 import java.io.*;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
-import bgu.spl.mics.application.publishers.Intelligence;
+import bgu.spl.mics.application.subscribers.Intelligence;
+import bgu.spl.mics.application.publishers.TimeService;
 import bgu.spl.mics.application.subscribers.M;
 import bgu.spl.mics.application.subscribers.Moneypenny;
+import bgu.spl.mics.application.subscribers.Q;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
-/** This is the Main class of the application. You should parse the input file,
+/** This is the Main class of the application. You should parse the input file, 
  * create the different instances of the objects, and run the system.
  * In the end, you should output serialized objects.
  */
 public class MI6Runner {
     public static void main(String[] args) {
-
-        System.out.println("asdasd");
         String jsonInput = args[0];
         String inventoryOutput = args[1];
         String diaryOutput = args[2];
-
         String input = null;
+
+
         try{
             input = new Scanner(new File(jsonInput)).useDelimiter("\\Z").next();
         }
@@ -34,30 +38,88 @@ public class MI6Runner {
             e.printStackTrace();
         }
         // deserializes json file
-       Gson gson = new Gson();
-       InputData InputData = gson.fromJson(input,bgu.spl.mics.application.passiveObjects.InputData.class);
+        Gson gson = new Gson();
+        InputData InputData = gson.fromJson(input,bgu.spl.mics.application.passiveObjects.InputData.class);
 
-        //creates objects
+        MessageBroker messageBroker = MessageBrokerImpl.getInstance();
+        //create passive objects
         Inventory inventory = Inventory.getInstance();
         Squad squad = Squad.getInstance();
 
-        //load objects with json input
+
+        //load passive objects with json input
         inventory.load(InputData.getInventoryData());
         squad.load(InputData.getSquad());
 
-        for( int i = 0; i < InputData.getServices().getM(); i++){
+        int mCount = InputData.getServices().getM();
+        int mpCount = InputData.getServices().getMoneypenny();
+        int intelCount = InputData.getServices().getIntelligences().length;
+        int counter = 0;
+
+        Runnable [] runnables = new Runnable[mCount+mpCount+intelCount+2];
+        List<Thread> threads = new ArrayList<>();
+        //create and initialize services objects
+        TimeService timeService = new TimeService(InputData.getServices().getTime());
+        runnables[counter] = timeService;
+        counter++;
+
+        Q q = new Q();
+        runnables[counter] = q;
+        messageBroker.register(q);
+
+        counter++;
+
+        for( int i = 0; i < mCount; i++){
             M m = new M(Integer.toString(i));
-            //TODO: push new M's to DataStructure
+            runnables[counter] = m;
+            messageBroker.register(m);
+
+            counter++;
         }
-        for( int i = 0; i < InputData.getServices().getM(); i++) {
-            Moneypenny moneypenny = new Moneypenny(Integer.toString(i));
-            //TODO: push new Moneypenny's to DataStructure
+        List<String> squadNumbers = new LinkedList<>();
+        for (Agent agent : InputData.getSquad())
+            squadNumbers.add(agent.getSerialNumber());
+
+        for( int i = 0; i < mpCount; i++) {
+            if(i%2==0) {
+                Moneypenny moneypenny = new Moneypenny(Integer.toString(i),squadNumbers, true);
+                runnables[counter] = moneypenny;
+                messageBroker.register(moneypenny);
+            }
+            else{
+                Moneypenny moneypenny = new Moneypenny(Integer.toString(i) ,squadNumbers,false);
+                runnables[counter] = moneypenny;
+                messageBroker.register(moneypenny);
+            }
+
+            counter++;
         }
-        for( int i = 0; i < InputData.getServices().getM(); i++) {
-/*            Intelligence intelligence = new Intelligence(InputData.getServices().getIntelligences()[i])
-            //TODO: push new M's to DataStructure*/
+        for( int i = 0; i < intelCount; i++) {
+            Intelligence intelligence = new Intelligence(InputData.getServices().getIntelligences()[i].getMissions());
+            intelligence.setId(i);
+            runnables[counter] = intelligence;
+            messageBroker.register(intelligence);
+
+            counter++;
         }
+        for (int i=0; i<runnables.length; i++) {
+            Thread sub = new Thread(runnables[i]);
+            if(i!=0)
+            threads.add(sub);
+            sub.setDaemon(true);
+            sub.start();
+        }
+
+            for(Thread thread : threads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+        }
+        Diary diary = Diary.getInstance();
+        diary.printToFile(args[1]);
+        inventory.printToFile(args[2]);
 
     }
-
 }
